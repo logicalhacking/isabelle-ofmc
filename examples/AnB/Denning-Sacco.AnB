@@ -1,0 +1,24 @@
+Protocol: DenningSacco
+
+Types: Agent A,B,s;
+       Number T,timestamp,Payload;
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,sk(A,s),timestamp;
+	   B: B,A,sk(B,s),timestamp;
+ 	   s: A,B,sk(A,s),sk(B,s)
+
+Actions:
+A->s: A,B
+s->A: {|B,KAB,T,{|A,KAB,T|}sk(B,s)|}sk(A,s)
+A->B: {|A,KAB,T|}sk(B,s)
+B->A: {|Payload|}KAB
+
+Goals:
+B *->* A: Payload
+
+Abstraction:
+T -> timestamp;
+Payload -> payload(B,A);
+KAB -> sk(A,B)

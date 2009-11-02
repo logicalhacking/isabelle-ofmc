@@ -1,0 +1,38 @@
+\documentclass[11pt,a4paper,DIVcalc,twoside]{scrartcl}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{isabelle}
+\usepackage{isabellesym}
+\isabellestyle{it}
+%\usepackage{fixisa}
+% <isabelle-section-setup>
+\renewcommand{\isamarkupheader}[1]{\section{#1}}
+\renewcommand{\isamarkupchapter}[1]{\subsection{#1}}
+\renewcommand{\isamarkupsection}[1]{\subsection{#1}}
+\renewcommand{\isamarkupsubsection}[1]{\subsubsection{#1}}
+
+\usepackage[hyperref,dvipsnames,table]{xcolor}
+% urls in roman style, theory text in math-similar italics
+\isabellestyle{it}
+\newcommand{\includeIfExists}[1]{\IfFileExists{#1}{\include{#1}}{}}
+
+\title{Testsuite}
+\author{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\input{session.tex}
+\includeIfExists{report.tex}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

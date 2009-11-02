@@ -1,0 +1,208 @@
+(*****************************************************************************
+ * Isabelle-OFMC --- Connecting OFMC and Isabelle/HOL
+ *
+ * ofmc-fp.grm ---
+ * This file is part of Isabelle-OFMC.
+ *
+ * Copyright (c) 2009 Achim D. Brucker, Germany
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials provided
+ *       with the distribution.
+ *
+ *     * Neither the name of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************)
+(* $Id: ofmc-fp.grm 901 2009-11-01 17:12:18Z brucker $ *)
+
+
+open OfmcFp
+
+fun rmOuterOp (Operator(_,[msg])) = msg
+  | rmOuterOp s = s
+
+%%
+
+%eop EOF 
+
+%left TMETAIMPLIES
+
+%name OfmcFpParser
+
+%term EOF
+    | SIMPLE_NAME of string
+    | TABSTRACTION of string
+    | TATTACK of string
+    | TARROW of string
+    | TMINUS of string
+    | TCAT of string
+    | TCBRACKET of string   
+    | TCOLON of string      
+    | TWHITESPACE of string
+    | TEQ of string      
+    | TNEQ of string      
+    | TBAR of string      
+    | TCOMMA of string      
+    | TCPAREN of string     
+    | TCRYPT of string
+    | TQUOTE of string
+    | TEXP of string
+    | TFACT of string
+    | TFIXEDPOINT of string 
+    | TFPState of string
+    | TIKNOWS of string
+    | TINITIAL of string
+    | TINV of string
+    | TKNOWLEDGE of string  
+    | TMETAIMPLIES of string
+    | TOBRACKET of string   
+    | TOPAREN of string     
+    | TPROTOCOL of string   
+    | TBACKEND of string   
+    | TREQUEST of string      
+    | TRULES of string      
+    | TSCRYPT of string
+    | TSECRET of string
+    | TSECSTATE of string
+    | TSECTION of string
+    | TSEMICOLON of string  
+    | TSTATE of string
+    | TSTEP of string
+    | TTYPES of string      
+    | TWITNESS of string
+    | TXOR of string
+
+%nonterm START of ofmc_fp
+         | ofmc_fp of ofmc_fp 
+         | simple_name of string
+	 | role of string
+	 | factname of string
+	 | msglist of Msg list
+	 | msg of Msg 
+	 | knowledge of (string * Fact) list
+	 | facts of Fact list
+	 | fact of Fact 
+	 | nfacts of Fact list
+	 | nfact of Fact 
+	 | rules of Rule list
+	 | abstractions of (Msg * Msg) list
+	 | typname of string
+	 | typnames of string list 
+	 | simple_names of string  
+	 | typ of string * (string list)
+	 | typlist of (string * (string list)) list
+	 | types of (string * (string list)) list
+
+%pos (int * int * int)
+
+%noshift EOF
+
+%%
+
+START:     ofmc_fp                                                    (ofmc_fp)
+
+ofmc_fp: TPROTOCOL TCOLON  simple_name                                (update_protocol simple_name empty_ofmc_fp)
+       | TPROTOCOL TCOLON  simple_name ofmc_fp                        (update_protocol simple_name ofmc_fp)
+       | TBACKEND TCOLON  simple_names                                (update_backend simple_names empty_ofmc_fp)
+       | TBACKEND TCOLON  simple_names ofmc_fp                        (update_backend simple_names ofmc_fp)
+       | TTYPES TCOLON  types                                         (update_types ((types_of empty_ofmc_fp)@types) empty_ofmc_fp)
+       | TTYPES TCOLON  types ofmc_fp                                 (update_types ((types_of ofmc_fp)@types) ofmc_fp)
+       | TSECTION TINITIAL TSECSTATE TCOLON knowledge                 (update_knowledge knowledge empty_ofmc_fp)   
+       | TSECTION TINITIAL TSECSTATE TCOLON knowledge ofmc_fp         (update_knowledge knowledge ofmc_fp) 
+       | TSECTION TRULES TCOLON rules                                 (update_rules rules empty_ofmc_fp)
+       | TSECTION TRULES TCOLON rules ofmc_fp                         (update_rules rules ofmc_fp) 
+       | TSECTION TFIXEDPOINT TCOLON knowledge                        (update_fixedpoint knowledge empty_ofmc_fp)
+       | TSECTION TFIXEDPOINT TCOLON knowledge ofmc_fp                (update_fixedpoint knowledge ofmc_fp) 
+       | TSECTION TABSTRACTION TCOLON abstractions                    (update_abstractions ((abstractions_of empty_ofmc_fp )@abstractions) empty_ofmc_fp)
+       | TSECTION TABSTRACTION TCOLON                                  (update_abstractions ((abstractions_of empty_ofmc_fp )@[]) empty_ofmc_fp)
+       | TSECTION TABSTRACTION TCOLON abstractions ofmc_fp            (update_abstractions ((abstractions_of ofmc_fp)@abstractions) ofmc_fp) 
+
+rules: TSTEP TCOLON facts TMETAIMPLIES facts                          ([(NONE, facts1, facts2)])
+     | TSTEP TCOLON facts TMETAIMPLIES facts  rules                   ((NONE, facts1, facts2)::rules) 
+     | TSTEP TCOLON facts  TBAR nfacts TMETAIMPLIES facts              ([(NONE, facts1@nfacts, facts)])
+     | TSTEP TCOLON facts  TBAR nfacts TMETAIMPLIES facts  rules       ((NONE, facts1@nfacts, facts)::rules) 
+     | TSTEP simple_name TCOLON facts TMETAIMPLIES facts              ([(SOME simple_name, facts1, facts2)])
+     | TSTEP simple_name TCOLON facts TMETAIMPLIES facts rules        ((SOME simple_name, facts1, facts2)::rules) 
+     | TSTEP simple_name TCOLON facts TBAR nfacts TMETAIMPLIES facts   ([(SOME simple_name, facts1@nfacts, facts2)])
+     | TSTEP simple_name TCOLON facts TBAR nfacts TMETAIMPLIES facts rules ((SOME simple_name, facts1@nfacts, facts2)::rules) 
+
+knowledge: factname TCOLON fact TSEMICOLON                            ([(factname, fact)])
+	 | factname TCOLON fact TSEMICOLON knowledge                  ((factname, fact)::(knowledge))
+
+facts: fact                                                           ([fact])
+     | fact TSEMICOLON facts                                          (fact::facts)
+
+fact: TSTATE TOPAREN role TCOMMA TOBRACKET msglist TCBRACKET TCPAREN  (State(role, msglist))
+    | TIKNOWS TOPAREN msg TCPAREN                                     (Iknows(msg))
+    | TATTACK TOPAREN msg TCPAREN                                     (Attack(msg))
+    | TSECRET TOPAREN msglist TCPAREN                                 (Secret(msglist))
+    | TWITNESS TOPAREN msglist TCPAREN                                (Witness(msglist))
+    | TREQUEST TOPAREN msglist TCPAREN                                (Request(msglist))
+
+nfacts: nfact                                                         ([nfact])
+      | nfact TSEMICOLON nfacts                                       (nfact::nfacts)
+
+nfact: msg TNEQ msg                                                   (NotEqual(msg1,msg2))
+
+
+msglist: msg                                                          ([msg])
+       | msg TCOMMA msglist                                           (msg::msglist)
+
+msg: SIMPLE_NAME                                                      (Atom SIMPLE_NAME)
+   | SIMPLE_NAME TOPAREN msglist TCPAREN                              (Operator(SIMPLE_NAME,msglist))	     
+   | SIMPLE_NAME msg                                              (Operator(SIMPLE_NAME,[msg]))	     
+   | TOPAREN msg TCPAREN                                              (msg)  
+
+role: SIMPLE_NAME                                                     (SIMPLE_NAME)
+
+factname: SIMPLE_NAME                                                 (SIMPLE_NAME)
+
+simple_name:SIMPLE_NAME                                               (SIMPLE_NAME)
+					  
+abstractions: msg TARROW msg                                          ([(rmOuterOp msg2,msg1)])
+	    | msg TARROW msg TSEMICOLON abstractions                  ((rmOuterOp msg2,msg1)::abstractions)
+
+types: TOBRACKET typlist TCBRACKET                                   (typlist)
+
+typlist: typ                                                         ([typ])
+        | typ TCOMMA typlist                                         (typ::typlist)
+
+typ: TOPAREN SIMPLE_NAME TCOMMA TOBRACKET typnames TCBRACKET TCPAREN ((SIMPLE_NAME,typnames))
+     | TOPAREN SIMPLE_NAME SIMPLE_NAME SIMPLE_NAME TCOMMA TOBRACKET typnames TCBRACKET TCPAREN ((SIMPLE_NAME,typnames))
+     | TOPAREN SIMPLE_NAME TCOMMA TOBRACKET TCBRACKET TCPAREN ((SIMPLE_NAME,[]))
+     | TOPAREN SIMPLE_NAME SIMPLE_NAME SIMPLE_NAME TCOMMA TOBRACKET TCBRACKET TCPAREN ((SIMPLE_NAME,[]))
+
+
+
+typnames: typname                                                    ([typname])
+        | typname TCOMMA typnames                                    (typname::typnames)
+
+simple_names: simple_name                                             (simple_name)
+        | simple_name  simple_names                        (simple_name^" "^simple_names)
+        | simple_name TMINUS simple_names                        (simple_name^" "^simple_names)
+
+typname: TQUOTE SIMPLE_NAME TQUOTE                                   (SIMPLE_NAME)
+

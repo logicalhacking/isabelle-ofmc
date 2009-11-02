@@ -1,0 +1,19 @@
+Protocol: WideMouthFrog
+## Problem with abstract authentication
+
+Types: Agent A,B,s;
+       Number TA,TS;  # actually timestamps
+       Symmetric_key KAB;
+       Function sk
+
+Knowledge: A: A,B,sk(A,s);
+	   B: B,A,sk(B,s);
+ 	   s: A,B,sk(A,s),sk(B,s)
+
+Actions:
+A->s: A,{|TA,B,KAB|}sk(A,s)
+s->B: {|TS,A,KAB|}sk(B,s)
+
+Goals:
+A *->* B: KAB
+

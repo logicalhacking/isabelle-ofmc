@@ -1,0 +1,18 @@
+Protocol: ISO_onepass_pk
+
+# should be fine (replay is not considered here!)
+
+Types: Agent A,B,s;
+       Number NA,Text1;
+       Function pk
+
+Knowledge: A: A,B,{A,pk(A)}inv(pk(s)),pk(A),inv(pk(A));
+	   B: B,pk(s)
+
+Actions:
+A->B: {A,pk(A)}inv(pk(s)),
+      {NA,B,Text1}inv(pk(A))
+
+Goals:
+A *-> B: Text1
+
