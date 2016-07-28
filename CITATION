@@ -1,0 +1,60 @@
+To cite ofmc-isabelle, please use
+  
+  Achim D. Brucker and Sebastian A. Mödersheim. Integrating Automated 
+  and Interactive Protocol Verification. In Workshop on Formal Aspects 
+  in Security and Trust (FAST 2009). Lecture Notes in Computer Science (5983), 
+  pages 248-262, Springer-Verlag , 2009. 
+  doi: 10.1007/978-3-642-12459-4_18
+
+A BibTeX entry for LaTeX users is
+
+@InCollection{	  brucker.ea:integrating:2009,
+  title		= {Integrating Automated and Interactive Protocol
+		  Verification},
+  author	= {Achim D. Brucker and Sebastian A. M{\"o}dersheim},
+  booktitle	= {Workshop on Formal Aspects in Security and Trust (FAST
+		  2009)},
+  publisher	= {Springer-Verlag},
+  address	= {Heidelberg},
+  series	= {Lecture Notes in Computer Science},
+  number	= {5983},
+  categories	= {isabelleofmc},
+  pages		= {248--262},
+  doi		= {10.1007/978-3-642-12459-4_18},
+  editor	= {Pierpaolo Degano and Joshua Guttman},
+  year		= {2009},
+  classification= {workshop},
+  keywords	= {protocol verification, model-checking, theorem proving},
+  areas		= {security, formal methods},
+  public	= {yes},
+  abstract	= {A number of current automated protocol verification tools
+		  are based on abstract interpretation techniques and other
+		  over-approximations of the set of reachable states or
+		  traces. The protocol models that these tools employ are
+		  shaped by the needs of automated verification and require
+		  subtle assumptions. Also, a complex verification tool may
+		  suffer from implementation bugs so that in the worst case
+		  the tool could accept some incorrect protocols as being
+		  correct. These risks of errors are also present, but
+		  considerably smaller, when using an LCF-style theorem
+		  prover like Isabelle. The interactive security proof,
+		  however, requires a lot of expertise and time.
+		  
+		  We combine the advantages of both worlds by using the
+		  representation of the over-approx\-imated search space
+		  computed by the automated tools as a ``proof idea'' in
+		  Isabelle. Thus, we devise proof tactics for Isabelle that
+		  generate the correctness proof of the protocol from the
+		  output of the automated tools. In the worst case, these
+		  tactics fail to construct a proof, namely when the
+		  representation of the search space is for some reason
+		  incorrect. However, when they succeed, the correctness only
+		  relies on the basic model and the Isabelle core.},
+  pdf		= {https://www.brucker.ch/bibliography/download/2009/brucker.ea-integrating-2009.pdf},
+  note		= {An extended version of this paper is available as IBM
+		  Research Technical Report, RZ3750.},
+  filelabel	= {Extended Version},
+  file		= {https://www.brucker.ch/bibliography/download/2009/brucker.ea-integrating-2009-b.pdf},
+  url		= {https://www.brucker.ch/bibliography/abstract/brucker.ea-integrating-2009}
+}
+
