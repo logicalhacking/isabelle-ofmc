@@ -4,7 +4,7 @@
  * config.sml.in --- main configuration file for Isabelle-OFMC
  * This file is part of Isabelle-OFMC.
  *
- * Copyright (c) 2009 Achim D. Brucker, Germany
+ * Copyright (c) 2009-2016 Achim D. Brucker, Germany
  *
  * All rights reserved.
  *
@@ -46,28 +46,34 @@ section {* Proof Obligation Manager Configuration *}
 
 
 section {* Isabelle/ofmc Specific Tactics *}
-setup {*
-Method.add_method("propagate_fp",
+
+method_setup propagate_fp = {*
 let
-  fun propagate_fp_tac_str ctxt facts =
+  fun propagate_fp_tac_str ctxt =
   let
-    val thy       = ProofContext.theory_of ctxt
+    val thy       = Proof_Context.theory_of ctxt
     fun m_tac  thm =
     let
       fun replace_bounded b (t1$t2) =  (replace_bounded b t1)$(replace_bounded b t2)
        | replace_bounded b (Bound c) =  Free(List.nth (b,(List.length b) - c -1)) 
        | replace_bounded _ t  =  t 
 
-      fun collect_facts b (((Const ("op :",_))$(t)$(Const("List.set",_)$_))) = [replace_bounded b t]
+      fun collect_facts b (((Const (@{const_name Set.member},_))$(t)$(Const(@{const_name List.set},_)$_))) = [replace_bounded b t]
         | collect_facts b (t1$t2)           = ((collect_facts b t1)@(collect_facts b t2))
         | collect_facts b (Abs (n,ty,t))     = collect_facts (b@[(n,ty)]) t 
         | collect_facts _ _                 = []
-  fun to_string f = (PrintMode.setmp [] Display.string_of_cterm (cterm_of thy f))
-  val cand = case prems_of(thm) of 
+ 
+      val string_of_term  = Sledgehammer_Util.hackish_string_of_term ctxt
+      val string_of_cterm = string_of_term o Thm.term_of 
+ 
+      val cand = case Thm.prems_of thm of 
                  [] => []
                | (p::ps) => collect_facts [] p
-       fun foo [f]  = (forw_inst_tac ctxt [(("c",0), to_string f )] (PureThy.get_thm thy "subsetD") 1)
-                             THEN (simp_tac HOL_ss 1)
+
+       fun my_inst_tac f  = (Rule_Insts.forw_inst_tac ctxt [((("c",0),Position.none), string_of_term f )] 
+                         [] (@{thm subsetD}) 1) 
+
+       fun foo [f]         = (my_inst_tac f) THEN (simp_tac ctxt 1)
          | foo (f::facts)  = foo [f] THEN (foo facts)
          | foo [] = all_tac
      in
@@ -77,10 +83,11 @@ let
     m_tac
   end
 in
-  Method.ctxt_args (fn ctxt => Method.METHOD (fn facts => propagate_fp_tac_str ctxt facts))
+Scan.succeed (fn ctxt: Proof.context =>
+      SIMPLE_METHOD' (fn i: int => propagate_fp_tac_str ctxt))
 end
-,"propagate fixed-point")
-*} 
+*} "propagate fixed-point"
+
 
 
 end
