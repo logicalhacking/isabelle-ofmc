@@ -1,10 +1,11 @@
 # Isabelle/OFMC - Linking OFMC and Isabelle/HOL
 This is a developer release for Isabelle/OFMC, i.e., while it may be
 of interested to experts, it is not yet useable by the general
-public. This development version comprises a small set of Isabelle
-theories and a prototypical tool, called anb2thy. Using OFMC's
-fixed-point module, anb2thy generates Isabelle theory files for
-protocols that haven been successfully validated by OFMC. 
+public. This development version comprise a small Isabelle
+theory and a prototypical tool, called anb2thy. Using OFMC's
+fixed-point module, anb2thy generate a Isabelle theory (for 
+ [Isabelle 2016](http://isabelle.in.tum.de/website-Isabelle2016/index.html)) 
+file for protocols that haven been successfully validated by OFMC. 
 
 ## Team 
 * [Achim D. Brucker](http://www.brucker.ch/)
