@@ -72,6 +72,8 @@ ws = [\ \t];
 
 
 "-"           => (Tokens.TMINUS(yytext,inputPos_half yypos,inputPos_half yypos));
+"{"            => (Tokens.TOBRACE(yytext,inputPos_half yypos,inputPos_half yypos));
+"}"            => (Tokens.TCBRACE(yytext,inputPos_half yypos,inputPos_half yypos));
 "->"           => (Tokens.TARROW(yytext,inputPos_half yypos,inputPos_half yypos));
 ":"            => (Tokens.TCOLON(yytext,inputPos_half yypos,inputPos_half yypos)); 
 "="            => (Tokens.TEQ(yytext,inputPos_half yypos,inputPos_half yypos)); 
@@ -113,6 +115,7 @@ ws = [\ \t];
 "Inv"          => (Tokens.TINV(yytext,inputPos_half yypos,inputPos_half yypos));
 "Exp"          => (Tokens.TEXP(yytext,inputPos_half yypos,inputPos_half yypos));
 "Xor"          => (Tokens.TXOR(yytext,inputPos_half yypos,inputPos_half yypos));
+"Derivation"   => (Tokens.TDERIVATION(yytext,inputPos_half yypos,inputPos_half yypos));
 
 (_|{alpha}|{digit})+      => (Tokens.SIMPLE_NAME(yytext,inputPos_half yypos,inputPos_half yypos));
 

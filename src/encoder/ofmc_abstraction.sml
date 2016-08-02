@@ -42,7 +42,7 @@ datatype CMsg = CVariable of string * string
 	    
 datatype  CFact = CState of string * CMsg list
 		| CIknows of CMsg
-		| CAttack of CMsg
+		| CAttack of CMsg list
 		| CWitness of CMsg list
 		| CRequest of CMsg list
 		| CSecret of CMsg list
@@ -114,9 +114,9 @@ fun deabstractMsg abstractions (Atom s)         = (case check_abstraction abstra
 						  
 fun deabstractFact abstractions (State (n,ms)) = (CState (n, map (deabstractMsg abstractions) ms))
   | deabstractFact abstractions (Iknows m)     = (CIknows (deabstractMsg abstractions m))
-  | deabstractFact abstractions (Attack m)     = (CAttack (deabstractMsg abstractions m))
-  | deabstractFact abstractions (Witness ms)   = (CWitness (map (deabstractMsg abstractions) ms)) 
+  | deabstractFact abstractions (Attack ms)   = (CAttack (map (deabstractMsg abstractions) ms)) 
   | deabstractFact abstractions (Request ms)   = (CRequest (map (deabstractMsg abstractions) ms))
+  | deabstractFact abstractions (Witness ms)   = (CWitness (map (deabstractMsg abstractions) ms))
   | deabstractFact abstractions (Secret ms)    = (CSecret (map (deabstractMsg abstractions) ms))
   | deabstractFact abstractions (Fact (n,m))   = (CFact (n, deabstractMsg abstractions m))
   | deabstractFact abstractions (NotEqual (n,m))   = (CNotEqual (deabstractMsg abstractions n, deabstractMsg abstractions m))

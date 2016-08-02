@@ -46,7 +46,7 @@ type ProtocolState = MsgPat list
 datatype  Fact = State of string * Msg list
                | FPState of string * Msg
                | Iknows of Msg
-               | Attack of Msg
+               | Attack of Msg list
                | Witness  of Msg list
                | Request  of Msg list
                | Secret   of Msg list
@@ -64,30 +64,35 @@ type ofmc_fp = {
      Knowledge: (string * Fact) list,
      FixedPoint: (string * Fact) list,
      Abstractions : (Msg * Msg) list,
+     Attack : Msg  list,
      Source : string
 } 
 
 
 val empty_ofmc_fp = {Backend="", Protocol="", Types = [("Number",["NI"])], Rules = [], Knowledge=[], FixedPoint=[], 
-		     Abstractions=[(Atom "ni",Atom "NI")], Source=""}:ofmc_fp
+		     Abstractions=[(Atom "ni",Atom "NI")], Source="", Attack=[]}:ofmc_fp
 (*  Abstractions=[(Atom "purpose",Atom "PURPOSE"),(Atom "ni",Atom "NI")], Source=""}:ofmc_fp *)
 
-fun update_protocol protocol ({Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_backend backend ({Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_types  types ({Backend=backend, Protocol=protocol,  Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_rules  rules ({Backend=backend, Protocol=protocol, Types=types, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_knowledge  knowledge ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_fixedpoint fixedpoint ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, Abstractions=abstractions,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_abstractions abstractions ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint,Source=source, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
-fun update_source source  ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint,Abstractions=abstractions, ...}:ofmc_fp) 
-    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source}:ofmc_fp) 
+
+fun update_protocol protocol ({Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source,  Attack=attack,...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_backend backend ({Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source,  Attack=attack,...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_types  types ({Backend=backend, Protocol=protocol,  Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source,  Attack=attack,...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_rules  rules ({Backend=backend, Protocol=protocol, Types=types, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source,  Attack=attack,...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_knowledge  knowledge ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack, ...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_fixedpoint fixedpoint ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, Abstractions=abstractions,Source=source, Attack=attack, ...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_abstractions abstractions ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint,Source=source, Attack=attack, ...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+fun update_source source  ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint,Abstractions=abstractions, Attack=attack, ...}:ofmc_fp) 
+    = ({Protocol=protocol, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Source=source, Attack=attack}:ofmc_fp) 
+
+fun update_attack attack ({Backend=backend, Protocol=protocol, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint,Abstractions=abstractions, Source=source, ...}:ofmc_fp) 
+    = ({Protocol=protocol, Source=source, Backend=backend, Types=types, Rules=rules, Knowledge = knowledge, FixedPoint=fixedpoint, Abstractions=abstractions,Attack=attack}:ofmc_fp) 
     
     
 fun mk_unique []      = []
@@ -104,6 +109,10 @@ fun sel_types_of t (ofmcfp:ofmc_fp) = mk_unique (List.concat (map #2 (List.filte
 fun fixedpoint_of (ofmcfp:ofmc_fp)     = #FixedPoint ofmcfp
 fun abstractions_of (ofmcfp:ofmc_fp)     = #Abstractions ofmcfp
 fun source_of (ofmcfp:ofmc_fp)     = #Source ofmcfp
+
+fun attack_of (ofmcfp:ofmc_fp) = #Attack ofmcfp
+
+fun is_safe ofmcfp = (attack_of ofmcfp = [])
 
 end
 

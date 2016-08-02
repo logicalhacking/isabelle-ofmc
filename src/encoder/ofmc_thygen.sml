@@ -32,13 +32,22 @@
 
 signature OFMC_ENCODER = 
 sig
-  val ofmc_thygen:          OfmcFp.ofmc_fp -> unit
-  val ofmc_thygenAnB:       string -> unit
-  val main:                 string * string list -> unit			     
+  type result
+  val ofmc_thygen:          OfmcFp.ofmc_fp -> result * OfmcFp.ofmc_fp
+  val ofmc_thygenAnB:       string -> result * OfmcFp.ofmc_fp
+  val main:                 string * string list -> unit * OfmcFp.ofmc_fp			     
 end
 
 structure ofmc_thygen = 
 struct
+datatype result = unknownError | success | parseError | attackOfmc | attackIsabelle
+
+fun string_of_result unknownError    = "unkown error"
+  | string_of_result success         = "success"
+  | string_of_result parseError      = "parse error"
+  | string_of_result attackOfmc      = "attack found by ofmc"
+  | string_of_result attackIsabelle  = "attack found by isabelle"
+
 
 val varcnt = ref ~1
 val noproof = ref false
@@ -160,7 +169,7 @@ fun gen_datatype ofmcfp =
 
       fun collect_vars ofmcfp (CState (s,ms)) = List.concat (map (collect_msgvars ofmcfp) ms)
 	| collect_vars ofmcfp (CIknows m)    = collect_msgvars ofmcfp m 
-	| collect_vars ofmcfp (CAttack m)    = collect_msgvars ofmcfp m
+	| collect_vars ofmcfp (CAttack ms)    = List.concat (map (collect_msgvars ofmcfp) ms)
 	| collect_vars ofmcfp (CWitness ms)  = List.concat (map (collect_msgvars ofmcfp) ms)
 	| collect_vars ofmcfp (CRequest ms)  = List.concat (map (collect_msgvars ofmcfp) ms)
 	| collect_vars ofmcfp (CSecret ms)   = List.concat (map (collect_msgvars ofmcfp) ms)
@@ -183,7 +192,7 @@ and string_of_cmsg_list []               = ""
 
 fun string_of_cfact ofmcfp (CState (s,ms)) = "State("^s^", ["^(string_of_cmsg_list ms)^"] )" 
   | string_of_cfact ofmcfp (CIknows m)     = "Iknows("^(string_of_cmsg m)^")"
-  | string_of_cfact ofmcfp (CAttack m)     = "Attack("^(string_of_cmsg m)^")"
+  | string_of_cfact ofmcfp (CAttack ms)     = "Attack("^(string_of_cmsg_list ms)^")"
   | string_of_cfact ofmcfp (CWitness ms)   = "Witness("^(string_of_cmsg_list ms)^")"
   | string_of_cfact ofmcfp (CRequest ms)   = "Request("^(string_of_cmsg_list ms)^")"
   | string_of_cfact ofmdfp (CSecret ms)    = "Secret("^(string_of_cmsg_list ms)^")"
@@ -265,7 +274,7 @@ fun gen_fp ofmcfp =
 		       
       fun mk_vars_unique (CState (s,ms)) = (CState (s, map mk_msgvars_unique ms))
 	| mk_vars_unique (CIknows m)     = (CIknows (mk_msgvars_unique m) )
-	| mk_vars_unique (CAttack m)     = (CAttack (mk_msgvars_unique m))
+	| mk_vars_unique (CAttack ms)     = (CAttack (map mk_msgvars_unique ms))
 	| mk_vars_unique (CWitness ms)   = (CWitness (map mk_msgvars_unique ms))
 	| mk_vars_unique (CRequest ms)   = (CRequest (map mk_msgvars_unique ms))
 	| mk_vars_unique (CSecret ms)    = (CSecret (map mk_msgvars_unique ms))
@@ -273,7 +282,7 @@ fun gen_fp ofmcfp =
 
       fun mk_vars_unique' v (CState (s,ms)) = (CState (s, map (mk_msgvars_unique' v) ms))
 	| mk_vars_unique' v (CIknows m)     = (CIknows (mk_msgvars_unique' v m) )
-	| mk_vars_unique' v (CAttack m)     = (CAttack (mk_msgvars_unique' v m))
+	| mk_vars_unique' v (CAttack ms)    = (CAttack  (map (mk_msgvars_unique' v) ms))
 	| mk_vars_unique' v (CWitness ms)   = (CWitness (map (mk_msgvars_unique' v) ms))
 	| mk_vars_unique' v (CRequest ms)   = (CRequest (map (mk_msgvars_unique' v) ms))
 	| mk_vars_unique' v (CSecret ms)    = (CSecret (map (mk_msgvars_unique' v) ms))
@@ -423,6 +432,8 @@ fun checkfp ofmcfp =
 
 
 fun ofmc_thygen ofmcfp = 
+    if is_safe ofmcfp 
+    then 
     let 
       val protocol = protocol_of ofmcfp
       val _ = print (gen_header ofmcfp)
@@ -444,9 +455,11 @@ fun ofmc_thygen ofmcfp =
       val _ = print ("*)\n")
 *)
       val _ = print ("\n\nend (* theory *)\n")
-    in () end
+      in (success,ofmcfp) end
+    else (attackOfmc,ofmcfp)
 
-val ofmc_thygenAnB = ofmc_thygen o ofmc_connector.parseAnBFile
+fun ofmc_thygenAnB f = (ofmc_thygen o ofmc_connector.parseAnBFile) f
+		     handle _ => (parseError,  OfmcFp.empty_ofmc_fp)
 
 fun print_usage name = let
   val _ = print("\n")
@@ -460,6 +473,8 @@ in
   ()
 end
 
+fun warning s = (TextIO.output (TextIO.stdErr, s); TextIO.flushOut TextIO.stdErr)
+
 fun main (name:string,args:(string list)) = 
     let 
       val prgName = (hd o rev) (String.fields (fn s => s = #"/" orelse s = #"\\") name) 
@@ -471,7 +486,26 @@ fun main (name:string,args:(string list)) =
        | (n, "--wauth"::ar)            => (ofmc_connector.wauth  := true ; main(name, ar))
        | (n, [file])                   => if String.isPrefix "-" file
 					 then print_usage name
-					 else ofmc_thygenAnB file
+					 else let 
+					     val timer =  Timer.startRealTimer ()
+	     				     val start = Timer.checkRealTimer timer
+					     val (result,fp) = ofmc_thygenAnB file
+					     val stop = Timer.checkRealTimer timer
+					     val duration = Time.-(stop,start)
+					     fun print_result duration result fp = 
+						 let 
+						   val _ = warning ("\nprotocol:  "^(protocol_of fp)^"\n")
+						   val _ = warning ("result:    "^(string_of_result result)^"\n")
+						   val _ = warning ("duration:    "^(Time.toString duration)^"\n")
+						   val _ = warning ("fixed-point: "
+								    ^(Int.toString(List.length (fixedpoint_of fp )))^"\n")
+						   val _ = warning ("knowledge:   "
+								    ^(Int.toString(List.length (knowledge_of fp )))^"\n")
+						 in () end 
+					   in
+					     print_result duration  result fp
+					   end
+		    
        | (_,_)                         => print_usage name
       )
     end

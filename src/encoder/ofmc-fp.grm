@@ -59,6 +59,8 @@ fun rmOuterOp (Operator(_,[msg])) = msg
     | TBAR of string      
     | TCOMMA of string      
     | TCPAREN of string     
+    | TOBRACE of string     
+    | TCBRACE of string     
     | TCRYPT of string
     | TQUOTE of string
     | TEXP of string
@@ -86,9 +88,13 @@ fun rmOuterOp (Operator(_,[msg])) = msg
     | TTYPES of string      
     | TWITNESS of string
     | TXOR of string
+    | TDERIVATION of string
 
 %nonterm START of ofmc_fp
+         | trace of ofmc_fp 
          | ofmc_fp of ofmc_fp 
+         | attackinfo of ofmc_fp 
+         | fp_or_attack of ofmc_fp 
          | simple_name of string
 	 | role of string
 	 | factname of string
@@ -114,13 +120,24 @@ fun rmOuterOp (Operator(_,[msg])) = msg
 
 %%
 
-START:     ofmc_fp                                                    (ofmc_fp)
+START: TBACKEND TCOLON  simple_names                                (update_backend simple_names empty_ofmc_fp)
+     | TBACKEND TCOLON  simple_names fp_or_attack                   (update_backend simple_names fp_or_attack)
 
-ofmc_fp: TPROTOCOL TCOLON  simple_name                                (update_protocol simple_name empty_ofmc_fp)
+fp_or_attack:TPROTOCOL TCOLON  simple_name                          (update_protocol simple_name empty_ofmc_fp)
        | TPROTOCOL TCOLON  simple_name ofmc_fp                        (update_protocol simple_name ofmc_fp)
-       | TBACKEND TCOLON  simple_names                                (update_backend simple_names empty_ofmc_fp)
-       | TBACKEND TCOLON  simple_names ofmc_fp                        (update_backend simple_names ofmc_fp)
-       | TTYPES TCOLON  types                                         (update_types ((types_of empty_ofmc_fp)@types) empty_ofmc_fp)
+
+     | TATTACK TOPAREN msglist TCPAREN                              (update_attack msglist empty_ofmc_fp)
+     | TATTACK TOPAREN msglist TCPAREN attackinfo                       (update_attack msglist attackinfo)
+
+
+attackinfo: TATTACK TOPAREN msglist TCPAREN                              (update_attack msglist empty_ofmc_fp)
+     | TATTACK TOPAREN msglist TCPAREN attackinfo                    (update_attack msglist attackinfo)
+     | TDERIVATION SIMPLE_NAME SIMPLE_NAME  TATTACK TCOLON TATTACK TOPAREN msglist TCPAREN trace  ((fn (_,_) => empty_ofmc_fp)  (trace,msglist))
+
+
+
+
+ofmc_fp: TTYPES TCOLON  types                                         (update_types ((types_of empty_ofmc_fp)@types) empty_ofmc_fp)
        | TTYPES TCOLON  types ofmc_fp                                 (update_types ((types_of ofmc_fp)@types) ofmc_fp)
        | TSECTION TINITIAL TSECSTATE TCOLON knowledge                 (update_knowledge knowledge empty_ofmc_fp)   
        | TSECTION TINITIAL TSECSTATE TCOLON knowledge ofmc_fp         (update_knowledge knowledge ofmc_fp) 
@@ -131,6 +148,20 @@ ofmc_fp: TPROTOCOL TCOLON  simple_name                                (update_pr
        | TSECTION TABSTRACTION TCOLON abstractions                    (update_abstractions ((abstractions_of empty_ofmc_fp )@abstractions) empty_ofmc_fp)
        | TSECTION TABSTRACTION TCOLON                                  (update_abstractions ((abstractions_of empty_ofmc_fp )@[]) empty_ofmc_fp)
        | TSECTION TABSTRACTION TCOLON abstractions ofmc_fp            (update_abstractions ((abstractions_of ofmc_fp)@abstractions) ofmc_fp) 
+		  
+trace: TMINUS trace                                                    (empty_ofmc_fp)
+     | TIKNOWS trace (empty_ofmc_fp)
+     | TSECRET trace (empty_ofmc_fp)
+     | TOBRACE trace                                        (empty_ofmc_fp)
+     | TCBRACE trace                                        (empty_ofmc_fp)
+     | TCBRACE                                        (empty_ofmc_fp)
+     | TOPAREN trace                                        (empty_ofmc_fp)
+     | TCPAREN trace                                        (empty_ofmc_fp)
+     | TCOMMA trace                                        (empty_ofmc_fp)
+     | TCPAREN                                         (empty_ofmc_fp)
+     | TCOMMA                                         (empty_ofmc_fp)
+     | SIMPLE_NAME trace                                               (empty_ofmc_fp)
+     | SIMPLE_NAME                                                (empty_ofmc_fp)
 
 rules: TSTEP TCOLON facts TMETAIMPLIES facts                          ([(NONE, facts1, facts2)])
      | TSTEP TCOLON facts TMETAIMPLIES facts  rules                   ((NONE, facts1, facts2)::rules) 
@@ -149,10 +180,10 @@ facts: fact                                                           ([fact])
 
 fact: TSTATE TOPAREN role TCOMMA TOBRACKET msglist TCBRACKET TCPAREN  (State(role, msglist))
     | TIKNOWS TOPAREN msg TCPAREN                                     (Iknows(msg))
-    | TATTACK TOPAREN msg TCPAREN                                     (Attack(msg))
     | TSECRET TOPAREN msglist TCPAREN                                 (Secret(msglist))
     | TWITNESS TOPAREN msglist TCPAREN                                (Witness(msglist))
     | TREQUEST TOPAREN msglist TCPAREN                                (Request(msglist))
+    | TATTACK TOPAREN msglist TCPAREN                                (Attack(msglist))
 
 nfacts: nfact                                                         ([nfact])
       | nfact TSEMICOLON nfacts                                       (nfact::nfacts)

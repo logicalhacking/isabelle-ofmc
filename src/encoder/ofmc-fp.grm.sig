@@ -2,6 +2,7 @@ signature OfmcFpParser_TOKENS =
 sig
 type ('a,'b) token
 type svalue
+val TDERIVATION: (string) *  'a * 'a -> (svalue,'a) token
 val TXOR: (string) *  'a * 'a -> (svalue,'a) token
 val TWITNESS: (string) *  'a * 'a -> (svalue,'a) token
 val TTYPES: (string) *  'a * 'a -> (svalue,'a) token
@@ -29,6 +30,8 @@ val TFACT: (string) *  'a * 'a -> (svalue,'a) token
 val TEXP: (string) *  'a * 'a -> (svalue,'a) token
 val TQUOTE: (string) *  'a * 'a -> (svalue,'a) token
 val TCRYPT: (string) *  'a * 'a -> (svalue,'a) token
+val TCBRACE: (string) *  'a * 'a -> (svalue,'a) token
+val TOBRACE: (string) *  'a * 'a -> (svalue,'a) token
 val TCPAREN: (string) *  'a * 'a -> (svalue,'a) token
 val TCOMMA: (string) *  'a * 'a -> (svalue,'a) token
 val TBAR: (string) *  'a * 'a -> (svalue,'a) token
