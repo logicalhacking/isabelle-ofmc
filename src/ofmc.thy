@@ -34,10 +34,6 @@ theory
   ofmc
 imports
   Main
-(* uses  
-  "kernel_ext/isabelle2009_kernel_patch.ML" 
-(*  "kernel_ext/ProofObligationMgr2008.sml" *) 
-*)
 begin
 
 
@@ -50,52 +46,6 @@ section {* Proof Obligation Manager Configuration *}
 
 
 section {* Isabelle/ofmc Specific Tactics *}
-
-(*
-
-
-setup {*
-Method.add_method ("propagate_fp_cterm",
-let 
-  fun propagate_fp_tac ctxt facts = 
-  let
-    val thy       = ProofContext.theory_of ctxt
-    fun m_tac  thm =
-    let
-      fun collect_facts (((Const ("op :",_))$(t)$(Const("List.set",_)$_))) = [t]
-        | collect_facts (t1$t2)           = ((collect_facts t1)@(collect_facts t2))
-        | collect_facts (Abs (_,_,t))     = collect_facts t
-        | collect_facts _                 = []
-      val cand = collect_facts (hd(prems_of(thm)))
-      fun subst v t = let
-val _ = warning ("substituting "^(Syntax.string_of_term ctxt t))
-in
-                 (Thm.cterm_of thy (Var((v,0),type_of t)),
-                       Thm.cterm_of thy t)
-end
-     val _ = warning ("Candidates found:")
-     val _ = map (fn p => warning (" "^(Syntax.string_of_term ctxt p)
-                  )) cand
-
-       fun foo [f]  = (forw_terminst_tac  [] [subst "c" f] (instantiate' [SOME (ctyp_of thy (type_of f))] [] (PureThy.get_thm thy "subsetD")) 1)
-                             THEN (simp_tac HOL_ss 1)
-         | foo (f::facts)  = foo [f] THEN (foo facts)
-         | foo [] = all_tac    
-     in
-         (foo cand) thm
-     end
-  in
-    m_tac
-  end
-in
-  Method.ctxt_args (fn ctxt => Method.METHOD (fn facts => propagate_fp_tac ctxt facts))
-end,
-"propagate fixed-point")
-*})
-
-*)
-
-
 setup {*
 Method.add_method("propagate_fp",
 let
@@ -116,9 +66,6 @@ let
   val cand = case prems_of(thm) of 
                  [] => []
                | (p::ps) => collect_facts [] p
-(*      val _ = warning "Candiates are"
-      val _ = map (fn s => warning (Syntax.string_of_term ctxt s)) cand *)
-(*       fun foo [f]  = (forw_inst_tac ctxt [("c", to_string f )] (PureThy.get_thm thy "subsetD") 1) *)
        fun foo [f]  = (forw_inst_tac ctxt [(("c",0), to_string f )] (PureThy.get_thm thy "subsetD") 1)
                              THEN (simp_tac HOL_ss 1)
          | foo (f::facts)  = foo [f] THEN (foo facts)
