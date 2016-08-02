@@ -29,6 +29,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************)
+(* $Id: ROOT.ML 978 2009-11-19 04:34:12Z brucker $ *)
 
 use "config.sml";
 
@@ -59,7 +60,32 @@ fun info () = writeln (infostr());
 use_thy "ofmc";
 
 
+fun check_thy thyname =
+    let 
+      val success   = (use_thy thyname; true)
+	  handle _ => false
+    in
+      if success
+      then print ("  ***\n  *** Successfully proofed theory \""^thyname^"\".\n  ***\n")
+      else 
+	print ("  ***\n  *** Proving theory \""^thyname^"\" FAILED.\n  ***\n")
+    end
 
+
+val timer =  Timer.startRealTimer ()
+
+fun log_thy thyname =
+    let
+      val start = Timer.checkRealTimer timer
+      val success   = (use_thy thyname; true)
+                 handle _ => false
+      val stop = Timer.checkRealTimer timer
+      val duration = Time.-(stop,start)
+      fun warning s = (TextIO.output (TextIO.stdErr, s); TextIO.flushOut TextIO.stdErr)
+		
+      val _ = warning ("\nresult:      "^(Bool.toString success)^"\n")
+      val _ = warning ("duration:    "^(Time.toString duration)^"\n")
+    in () end
 
 val welcome = Toplevel.imperative (info);
 val welcomeP =
