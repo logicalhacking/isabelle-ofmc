@@ -29,46 +29,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-default: ofmc-anb
-images: 
-test: ofmc-anb
-
-all: images test
-
-## global settings
-
-SRC = $(ISABELLE_HOME)/src
-OUT = $(ISABELLE_OUTPUT)
-LOG = $(OUT)/log
-HEAP = ofmc-anb
-
-MV = mv
-CP = cp 
-
-USEDIR = $(ISATOOL) usedir -b -g true -v true -i true -d pdf  ## -D generated
-USEDIR = $(ISATOOL) usedir -b 
-
-HOSTNAME = $(shell,$(ISATOOL) getenv HOSTNAME)
-export HOSTNAME
-
-## ofmc-isabelle
-
-$(HEAP):  $(LOG)/HOL-$(HEAP).gz
-
-$(LOG)/HOL-$(HEAP).gz: ROOT.ML document/root.tex *.thy
-	@$(RM) -rf $(ISABELLE_BROWSER_INFO)/HOL/$(HEAP)/document
-	@$(USEDIR) ofmc $(HEAP)
-	@$(CP) $(ISABELLE_BROWSER_INFO)/HOL/ofmc/$(HEAP)/document.pdf $(HEAP).pdf
-
 thygen:
-	for i in AnB/*.AnB; do echo -e $$i; anb2thy $$i > `basename $$i .AnB`.thy; done
+	for i in AnB/*.AnB; do echo -e $$i; ../bin/anb2thy $$i > `basename $$i .AnB`.thy; done
 thygen-noproof:
-	for i in AnB/*.AnB; do echo -e $$i; anb2thy --noproof $$i > `basename $$i .AnB`.thy; done
+	for i in AnB/*.AnB; do echo -e $$i; ../bin/anb2thy --noproof $$i > `basename $$i .AnB`.thy; done
 
 fpgen:
 	for i in AnB/*.AnB; do echo -e $$i; ofmc $$i -ot Isa > AnB/`basename $$i .AnB`.fp; done
-
-## clean
-
-clean:
-	@$(RM) -f $(LOG)/HOL-$(HEAP).gz
