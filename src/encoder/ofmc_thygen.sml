@@ -84,7 +84,7 @@ fun gen_header ofmcfp =
 	else filename (source_of ofmcfp) )
       ^"\"\n"
       ^" imports"^"\n"
-      ^"   ofmc"^"\n"
+      ^"   \"../src/ofmc\""^"\n"
       ^"begin"^"\n\n"
     end
 
