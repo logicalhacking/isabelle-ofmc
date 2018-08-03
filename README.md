@@ -16,6 +16,8 @@ file for protocols that haven been successfully validated by OFMC.
 
 This project is licensed under a 2-clause BSD-style license.
 
+SPDX-License-Identifier: BSD-2-Clause
+
 ## Publications
 
 * Achim D. Brucker and Sebastian A. Mödersheim. [Integrating Automated 
