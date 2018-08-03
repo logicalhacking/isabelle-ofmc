@@ -18,6 +18,12 @@ This project is licensed under a 2-clause BSD-style license.
 
 SPDX-License-Identifier: BSD-2-Clause
 
+## Master Repository
+
+The master git repository for this project is hosted by the [Software
+Assurance & Security Research Team](https://logicalhacking.com) at
+<https://git.logicalhacking.com/ProtocolSecurity/isabelle-ofmc>.
+
 ## Publications
 
 * Achim D. Brucker and Sebastian A. Mödersheim. [Integrating Automated 
