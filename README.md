@@ -8,6 +8,32 @@ fixed-point module, anb2thy generate a Isabelle theory (for
  [Isabelle 2016](http://isabelle.in.tum.de/website-Isabelle2016/index.html)) 
 file for protocols that haven been successfully validated by OFMC. 
 
+This project has been superseded by [Automated Stateful Protocol
+Verification](https://www.isa-afp.org/entries/Automated_Stateful_Protocol_Verification.html)
+and is no longer maintained. In contrast, [Automated Stateful Protocol
+Verification](https://www.isa-afp.org/entries/Automated_Stateful_Protocol_Verification.html)
+is actively maintained and also, as official entry of the Archive of
+Formal Proofs, always supports the latest version of Isabelle. More
+information about the [Automated Stateful Protocol
+Verification](https://www.isa-afp.org/entries/Automated_Stateful_Protocol_Verification.html)
+project (including its source code) is available in the AFP:
+
+* Andreas V. Hess, Sebastian Mödersheim, Achim D. Brucker, and Anders
+  Schlichtkrull. Automated Stateful Protocol Verification. In Archive 
+  of Formal Proofs, 2020. 
+  <http://www.isa-afp.org/entries/Automated_Stateful_Protocol_Verification.html>, 
+  Formal proof development
+
+The following publication provides a more abstract description of the
+underlying theory:
+
+* Andreas V. Hess, Sebastian Mödersheim, Achim D. Brucker, and Anders
+  Schlichtkrull. Performing Security Proofs of Stateful Protocols. In
+  34th IEEE Computer Security Foundations Symposium (CSF). , IEEE,
+  2021.
+  https://www.brucker.ch/bibliography/abstract/brucker.ea-web-components-2019
+
+
 ## Team 
 
 * [Achim D. Brucker](http://www.brucker.ch/)
