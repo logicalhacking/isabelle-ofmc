@@ -22,15 +22,15 @@ project (including its source code) is available in the AFP:
   Schlichtkrull. Automated Stateful Protocol Verification. In Archive 
   of Formal Proofs, 2020. 
   <http://www.isa-afp.org/entries/Automated_Stateful_Protocol_Verification.html>, 
-  Formal proof development
+  Formal proof development.
 
 The following publication provides a more abstract description of the
 underlying theory:
 
 * Andreas V. Hess, Sebastian Mödersheim, Achim D. Brucker, and Anders
   Schlichtkrull. Performing Security Proofs of Stateful Protocols. In
-  34th IEEE Computer Security Foundations Symposium (CSF). , IEEE,
-  2021.
+  34th IEEE Computer Security Foundations Symposium (CSF). IEEE,
+  2021. [doi:10.1109/CSF51468.2021.00006](https://doi.org/10.1109/CSF51468.2021.00006).
   https://www.brucker.ch/bibliography/abstract/brucker.ea-web-components-2019
 
 
